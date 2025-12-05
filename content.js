@@ -172,15 +172,36 @@
       }
     );
 
-    // Listen for theme updates
+    // Listen for theme updates AND time updates from other tabs
     try {
       if (isContextValid()) {
         chrome.storage.onChanged.addListener(function (changes, namespace) {
           if (!isContextValid()) return;
 
+          // Theme changes
           if (changes.widgetTheme) {
             const theme = changes.widgetTheme.newValue || 'dark';
             widget.className = `theme-${theme}`;
+          }
+
+          // Time data changes from other tabs - SYNC!
+          if (changes.timeData && changes.timeData.newValue) {
+            const today = new Date().toDateString();
+            const siteKey = `${currentDomain}_${today}`;
+            const newTimeData = changes.timeData.newValue;
+
+            if (
+              newTimeData[siteKey] !== undefined &&
+              newTimeData[siteKey] !== elapsedSeconds
+            ) {
+              // Another tab updated the time - sync to it!
+              elapsedSeconds = newTimeData[siteKey];
+              updateDisplay();
+              console.log(
+                '⏱️ Time synced from another tab:',
+                formatTime(elapsedSeconds)
+              );
+            }
           }
         });
       }
@@ -188,25 +209,65 @@
       console.warn('Time Tracker: Could not add storage listener', e);
     }
 
+    // Helper function to format time for logging
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = seconds % 60;
+      return `${pad(h)}:${pad(m)}:${pad(s)}`;
+    }
+
     // Timer functions
     function startTimer() {
       if (!isContextValid()) return;
 
-      updateDisplay();
-      timerInterval = setInterval(() => {
-        if (!isContextValid()) {
-          clearInterval(timerInterval);
-          return;
+      // Don't start timer if tab is not visible
+      if (document.hidden) {
+        console.log('⏱️ Tab hidden - timer paused');
+        return;
+      }
+
+      // Load latest time from storage before starting (in case another tab updated it)
+      safeStorageGet(['timeData'], function (data) {
+        if (!isContextValid()) return;
+
+        const today = new Date().toDateString();
+        const timeData = data.timeData || {};
+        const siteKey = `${currentDomain}_${today}`;
+
+        // Use the latest time from storage
+        if (timeData[siteKey] !== undefined) {
+          elapsedSeconds = timeData[siteKey];
         }
 
-        elapsedSeconds++;
         updateDisplay();
 
-        // Save every 10 seconds
-        if (elapsedSeconds % 10 === 0) {
-          saveTimeData();
+        // Clear any existing timer
+        if (timerInterval) {
+          clearInterval(timerInterval);
         }
-      }, 1000);
+
+        // Start counting
+        timerInterval = setInterval(() => {
+          if (!isContextValid()) {
+            clearInterval(timerInterval);
+            return;
+          }
+
+          // Only count if tab is visible
+          if (document.hidden) {
+            return;
+          }
+
+          elapsedSeconds++;
+          updateDisplay();
+
+          // Save every 10 seconds
+          if (elapsedSeconds % 10 === 0) {
+            saveTimeData();
+          }
+        }, 1000);
+      });
     }
 
     function updateDisplay() {
@@ -243,6 +304,8 @@
 
       const today = new Date().toDateString();
       const siteKey = `${currentDomain}_${today}`;
+
+      console.log(`⏱️ Saving time: ${formatTime(elapsedSeconds)}`);
 
       safeStorageGet(['timeData'], function (data) {
         if (!isContextValid()) return;
@@ -346,17 +409,38 @@
       saveTimeData();
     });
 
-    // Pause timer when tab is not visible
+    // Pause timer when tab is not visible, resume and sync when visible
     document.addEventListener('visibilitychange', function () {
       if (!isContextValid()) return;
 
       if (document.hidden) {
+        // Tab hidden - pause timer and save
+        console.log('⏱️ Tab hidden - pausing timer');
         if (timerInterval) {
           clearInterval(timerInterval);
+          timerInterval = null;
         }
         saveTimeData();
       } else {
-        startTimer();
+        // Tab visible - sync latest time and resume
+        console.log('⏱️ Tab visible - syncing and resuming timer');
+
+        // Load latest time from storage (another tab might have updated it)
+        safeStorageGet(['timeData'], function (data) {
+          if (!isContextValid()) return;
+
+          const today = new Date().toDateString();
+          const timeData = data.timeData || {};
+          const siteKey = `${currentDomain}_${today}`;
+
+          if (timeData[siteKey] !== undefined) {
+            elapsedSeconds = timeData[siteKey];
+            updateDisplay();
+          }
+
+          // Now start counting
+          startTimer();
+        });
       }
     });
   } catch (error) {
