@@ -124,6 +124,7 @@
         'trackAllSites',
         'trackedSites',
         'trackingPaused',
+        'widgetVisible',
       ],
       function (data) {
         // Early exit if context is invalid - prevents all errors
@@ -131,6 +132,13 @@
           console.log(
             'Time Tracker: Skipping widget initialization - extension context invalid'
           );
+          return;
+        }
+
+        // Check if widget should be globally hidden
+        const widgetVisible = data.widgetVisible !== false; // Default is true
+        if (!widgetVisible) {
+          isVisible = false;
           return;
         }
 
@@ -239,6 +247,46 @@
       }
     } catch (e) {
       console.warn('Time Tracker: Could not add storage listener', e);
+    }
+
+    // Listen for messages from popup to show/hide widget
+    try {
+      if (isContextValid()) {
+        chrome.runtime.onMessage.addListener(function (
+          message,
+          sender,
+          sendResponse
+        ) {
+          if (!isContextValid()) return;
+
+          if (message.action === 'hideWidget') {
+            if (widget && widget.parentNode) {
+              widget.style.display = 'none';
+              isVisible = false;
+              // Stop timer when hidden
+              if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+              }
+              saveTimeData();
+            }
+          } else if (message.action === 'showWidget') {
+            if (widget && widget.parentNode) {
+              widget.style.display = 'block';
+              isVisible = true;
+              // Restart timer when shown (if not paused globally)
+              safeStorageGet(['trackingPaused'], function (data) {
+                const isPaused = data.trackingPaused || false;
+                if (!isPaused && !document.hidden) {
+                  startTimer();
+                }
+              });
+            }
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Time Tracker: Could not add message listener', e);
     }
 
     // Helper function to format time for logging

@@ -141,6 +141,53 @@
         line-height: 1.5;
         margin-top: 8px;
       }
+
+      .toggle-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        margin-bottom: 12px;
+      }
+
+      .toggle-label {
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .toggle-switch {
+        position: relative;
+        width: 50px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .toggle-switch.active {
+        background: #10b981;
+      }
+
+      .toggle-slider {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+      }
+
+      .toggle-switch.active .toggle-slider {
+        transform: translateX(26px);
+      }
     </style>
   </head>
   <body>
@@ -148,6 +195,12 @@
 
     <div class="section">
       <h2 style="margin-bottom: 12px">📊 Today's Usage</h2>
+      <div class="toggle-container">
+        <span class="toggle-label">👁️ Show Widget on Pages</span>
+        <div id="widgetToggle" class="toggle-switch active">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
       <div style="display: flex; gap: 8px; margin-bottom: 12px">
         <button
           id="pauseBtn"

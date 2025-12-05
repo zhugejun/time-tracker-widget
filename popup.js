@@ -3,6 +3,36 @@
 document.addEventListener('DOMContentLoaded', function () {
   loadData();
   updatePauseButton();
+  updateWidgetToggle();
+
+  // Widget visibility toggle
+  document
+    .getElementById('widgetToggle')
+    .addEventListener('click', function () {
+      chrome.storage.local.get(['widgetVisible'], function (data) {
+        const currentState = data.widgetVisible !== false; // Default is true
+        const newState = !currentState;
+
+        chrome.storage.local.set({ widgetVisible: newState }, function () {
+          updateWidgetToggle();
+          // Notify all tabs to show/hide widget
+          chrome.tabs.query({}, function (tabs) {
+            tabs.forEach((tab) => {
+              chrome.tabs.sendMessage(
+                tab.id,
+                {
+                  action: newState ? 'showWidget' : 'hideWidget',
+                },
+                function () {
+                  // Ignore errors for tabs that don't have content script
+                  chrome.runtime.lastError;
+                }
+              );
+            });
+          });
+        });
+      });
+    });
 
   // Pause/Resume button
   document.getElementById('pauseBtn').addEventListener('click', function () {
@@ -144,6 +174,19 @@ function updatePauseButton() {
     } else {
       btn.textContent = '⏸️ Pause All';
       btn.style.background = '#f59e0b';
+    }
+  });
+}
+
+function updateWidgetToggle() {
+  chrome.storage.local.get(['widgetVisible'], function (data) {
+    const isVisible = data.widgetVisible !== false; // Default is true
+    const toggle = document.getElementById('widgetToggle');
+
+    if (isVisible) {
+      toggle.classList.add('active');
+    } else {
+      toggle.classList.remove('active');
     }
   });
 }
