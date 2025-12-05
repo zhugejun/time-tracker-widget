@@ -147,47 +147,53 @@
     <h1>⏱️ Time Tracker</h1>
 
     <div class="section">
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 12px;
-        "
-      >
-        <h2>📊 Today's Usage</h2>
-        <div style="display: flex; gap: 8px">
-          <button
-            id="dashboardBtn"
-            style="
-              background: #3b82f6;
-              border: none;
-              color: white;
-              padding: 6px 12px;
-              border-radius: 6px;
-              cursor: pointer;
-              font-size: 12px;
-              font-weight: 600;
-            "
-          >
-            📊 Dashboard
-          </button>
-          <button
-            id="settingsBtn"
-            style="
-              background: rgba(255, 255, 255, 0.2);
-              border: none;
-              color: white;
-              padding: 6px 12px;
-              border-radius: 6px;
-              cursor: pointer;
-              font-size: 12px;
-              font-weight: 600;
-            "
-          >
-            ⚙️ Settings
-          </button>
-        </div>
+      <h2 style="margin-bottom: 12px">📊 Today's Usage</h2>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px">
+        <button
+          id="pauseBtn"
+          style="
+            background: #f59e0b;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+          "
+        >
+          ⏸️ Pause All
+        </button>
+        <button
+          id="dashboardBtn"
+          style="
+            background: #3b82f6;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+          "
+        >
+          📊 Dashboard
+        </button>
+        <button
+          id="settingsBtn"
+          style="
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+          "
+        >
+          ⚙️ Settings
+        </button>
       </div>
       <div id="timeList" class="time-list scrollbar"></div>
     </div>

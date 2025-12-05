@@ -2,6 +2,19 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   loadData();
+  updatePauseButton();
+
+  // Pause/Resume button
+  document.getElementById('pauseBtn').addEventListener('click', function () {
+    chrome.storage.local.get(['trackingPaused'], function (data) {
+      const currentState = data.trackingPaused || false;
+      const newState = !currentState;
+
+      chrome.storage.local.set({ trackingPaused: newState }, function () {
+        updatePauseButton();
+      });
+    });
+  });
 
   // Dashboard button
   document
@@ -118,4 +131,19 @@ function formatTime(seconds) {
   } else {
     return `${secs}s`;
   }
+}
+
+function updatePauseButton() {
+  chrome.storage.local.get(['trackingPaused'], function (data) {
+    const isPaused = data.trackingPaused || false;
+    const btn = document.getElementById('pauseBtn');
+
+    if (isPaused) {
+      btn.textContent = '▶️ Resume All';
+      btn.style.background = '#10b981';
+    } else {
+      btn.textContent = '⏸️ Pause All';
+      btn.style.background = '#f59e0b';
+    }
+  });
 }

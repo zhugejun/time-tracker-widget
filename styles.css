@@ -162,6 +162,38 @@
   background: rgba(0, 0, 0, 0.15);
 }
 
+.time-tracker-pause {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 16px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.time-tracker-pause:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.theme-light .time-tracker-pause,
+.theme-transparent .time-tracker-pause {
+  background: rgba(0, 0, 0, 0.1);
+  color: #374151;
+}
+
+.theme-light .time-tracker-pause:hover,
+.theme-transparent .time-tracker-pause:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
 .time-tracker-time {
   font-size: 32px;
   font-weight: 700;

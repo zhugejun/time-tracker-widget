@@ -107,6 +107,7 @@
     <div class="time-tracker-header">
       <span class="time-tracker-icon">⏱️</span>
       <span class="time-tracker-title">Time on ${currentDomain}</span>
+      <button class="time-tracker-pause" title="Pause tracking">⏸️</button>
       <button class="time-tracker-close" title="Hide">×</button>
     </div>
     <div class="time-tracker-time">00:00:00</div>
@@ -122,6 +123,7 @@
         'widgetTheme',
         'trackAllSites',
         'trackedSites',
+        'trackingPaused',
       ],
       function (data) {
         // Early exit if context is invalid - prevents all errors
@@ -167,8 +169,16 @@
         // Add to page
         document.body.appendChild(widget);
 
-        // Start timer
-        startTimer();
+        // Initialize pause state
+        const trackingPaused = data.trackingPaused || false;
+        updatePauseButton(trackingPaused);
+
+        // Start timer (if not paused)
+        if (!trackingPaused) {
+          startTimer();
+        } else {
+          console.log('⏱️ Tracking is paused globally');
+        }
       }
     );
 
@@ -203,6 +213,28 @@
               );
             }
           }
+
+          // Pause state changes from other tabs/popup - SYNC!
+          if (changes.trackingPaused !== undefined) {
+            const isPaused = changes.trackingPaused.newValue;
+            updatePauseButton(isPaused);
+
+            if (isPaused) {
+              // Paused from another tab
+              console.log('⏸️ Tracking paused from another source');
+              if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+              }
+              saveTimeData();
+            } else {
+              // Resumed from another tab
+              console.log('▶️ Tracking resumed from another source');
+              if (!document.hidden) {
+                startTimer();
+              }
+            }
+          }
         });
       }
     } catch (e) {
@@ -217,6 +249,50 @@
       return `${pad(h)}:${pad(m)}:${pad(s)}`;
     }
 
+    // Update pause button appearance
+    function updatePauseButton(isPaused) {
+      const pauseBtn = widget.querySelector('.time-tracker-pause');
+      if (pauseBtn) {
+        if (isPaused) {
+          pauseBtn.textContent = '▶️';
+          pauseBtn.title = 'Resume tracking';
+          widget.style.opacity = '0.7';
+        } else {
+          pauseBtn.textContent = '⏸️';
+          pauseBtn.title = 'Pause tracking';
+          widget.style.opacity = '1';
+        }
+      }
+    }
+
+    // Toggle pause state
+    function togglePause() {
+      safeStorageGet(['trackingPaused'], function (data) {
+        if (!isContextValid()) return;
+
+        const currentState = data.trackingPaused || false;
+        const newState = !currentState;
+
+        safeStorageSet({ trackingPaused: newState }, function () {
+          updatePauseButton(newState);
+
+          if (newState) {
+            // Pausing
+            console.log('⏸️ Tracking paused globally');
+            if (timerInterval) {
+              clearInterval(timerInterval);
+              timerInterval = null;
+            }
+            saveTimeData();
+          } else {
+            // Resuming
+            console.log('▶️ Tracking resumed');
+            startTimer();
+          }
+        });
+      });
+    }
+
     // Timer functions
     function startTimer() {
       if (!isContextValid()) return;
@@ -227,9 +303,16 @@
         return;
       }
 
-      // Load latest time from storage before starting (in case another tab updated it)
-      safeStorageGet(['timeData'], function (data) {
+      // Check if tracking is paused globally
+      safeStorageGet(['timeData', 'trackingPaused'], function (data) {
         if (!isContextValid()) return;
+
+        // Don't start if paused
+        if (data.trackingPaused) {
+          console.log('⏱️ Tracking is paused - timer not started');
+          updatePauseButton(true);
+          return;
+        }
 
         const today = new Date().toDateString();
         const timeData = data.timeData || {};
@@ -321,7 +404,8 @@
       // Don't drag if clicking on buttons
       if (
         e.target.classList.contains('time-tracker-close') ||
-        e.target.classList.contains('time-tracker-reset')
+        e.target.classList.contains('time-tracker-reset') ||
+        e.target.classList.contains('time-tracker-pause')
       ) {
         return;
       }
@@ -389,6 +473,15 @@
             safeStorageSet({ hiddenSites });
           }
         });
+      });
+    }
+
+    // Pause/Resume button
+    const pauseBtn = widget.querySelector('.time-tracker-pause');
+    if (pauseBtn) {
+      pauseBtn.addEventListener('click', function (e) {
+        e.stopPropagation(); // Prevent dragging when clicking pause
+        togglePause();
       });
     }
 
