@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Time Tracker - Settings</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: #f3f4f6;
+        padding: 40px 20px;
+        color: #1f2937;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background: white;
+        padding: 32px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+      }
+
+      .header h1 {
+        font-size: 32px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .header p {
+        color: #6b7280;
+        font-size: 16px;
+      }
+
+      .section {
+        background: white;
+        padding: 32px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+      }
+
+      .section h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+        color: #1f2937;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #f3f4f6;
+      }
+
+      .setting-row:last-child {
+        border-bottom: none;
+      }
+
+      .setting-label {
+        flex: 1;
+      }
+
+      .setting-label h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .setting-label p {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .theme-card {
+        border: 3px solid transparent;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        position: relative;
+      }
+
+      .theme-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .theme-card.active {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        transform: scale(1.02);
+      }
+
+      .theme-card.active::after {
+        content: '✓';
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        background: #3b82f6;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        animation: checkmarkPop 0.3s ease;
+      }
+
+      @keyframes checkmarkPop {
+        0% {
+          transform: scale(0);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .theme-card.dark {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        color: white;
+      }
+
+      .theme-card.light {
+        background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+        border: 1px solid #e5e7eb;
+        color: #1f2937;
+      }
+
+      .theme-card.blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+      }
+
+      .theme-card.minimal-dark {
+        background: linear-gradient(
+          135deg,
+          rgba(17, 24, 39, 0.6) 0%,
+          rgba(17, 24, 39, 0.8) 100%
+        );
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .theme-card.transparent {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.05) 0%,
+          rgba(0, 0, 0, 0.1) 100%
+        );
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        color: #1f2937;
+        backdrop-filter: blur(8px);
+      }
+
+      .theme-name {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .theme-preview {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 12px 0;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .theme-card.dark .theme-preview,
+      .theme-card.blue .theme-preview,
+      .theme-card.minimal-dark .theme-preview {
+        color: #10b981;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .theme-card.light .theme-preview,
+      .theme-card.transparent .theme-preview {
+        color: #10b981;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .theme-desc {
+        font-size: 13px;
+        opacity: 0.8;
+      }
+
+      .site-list {
+        margin-top: 16px;
+      }
+
+      .site-input-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .site-input-row input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      .site-input-row input:focus {
+        outline: none;
+        border-color: #3b82f6;
+      }
+
+      .add-btn {
+        padding: 10px 20px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .add-btn:hover {
+        background: #2563eb;
+      }
+
+      .tracked-sites {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .site-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+      }
+
+      .site-item span {
+        font-size: 14px;
+        color: #374151;
+      }
+
+      .remove-btn {
+        padding: 6px 12px;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .remove-btn:hover {
+        background: #dc2626;
+      }
+
+      .toggle-switch {
+        position: relative;
+        width: 56px;
+        height: 28px;
+        background: #d1d5db;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .toggle-switch.active {
+        background: #3b82f6;
+      }
+
+      .toggle-switch::after {
+        content: '';
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: white;
+        top: 3px;
+        left: 3px;
+        transition: all 0.3s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .toggle-switch.active::after {
+        left: 31px;
+      }
+
+      .info-box {
+        background: #f0f9ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 16px;
+      }
+
+      .info-box p {
+        font-size: 14px;
+        color: #1e40af;
+        line-height: 1.6;
+      }
+
+      .save-notice {
+        text-align: center;
+        color: #10b981;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 12px;
+        background: #d1fae5;
+        border-radius: 8px;
+        display: none;
+      }
+
+      .save-notice.show {
+        display: block;
+        animation: fadeIn 0.3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>⏱️ Time Tracker Settings</h1>
+        <p>Customize how your time tracker looks and works</p>
+      </div>
+
+      <div class="save-notice" id="saveNotice">
+        ✓ Settings saved automatically
+      </div>
+
+      <div class="section">
+        <h2>🎨 Theme</h2>
+        <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px">
+          Choose a theme that matches your style. Click on any theme to preview
+          and select it.
+        </p>
+        <div class="theme-grid" id="themeGrid">
+          <div class="theme-card dark" data-theme="dark">
+            <div class="theme-name">Dark</div>
+            <div class="theme-preview">01:23:45</div>
+            <div class="theme-desc">Sleek and minimal</div>
+          </div>
+          <div class="theme-card light" data-theme="light">
+            <div class="theme-name">Light</div>
+            <div class="theme-preview">01:23:45</div>
+            <div class="theme-desc">Clean and bright</div>
+          </div>
+          <div class="theme-card blue" data-theme="blue">
+            <div class="theme-name">Blue</div>
+            <div class="theme-preview">01:23:45</div>
+            <div class="theme-desc">Professional look</div>
+          </div>
+          <div class="theme-card minimal-dark" data-theme="minimal-dark">
+            <div class="theme-name">Minimal Dark</div>
+            <div class="theme-preview">01:23:45</div>
+            <div class="theme-desc">Subtle & unobtrusive</div>
+          </div>
+          <div class="theme-card transparent" data-theme="transparent">
+            <div class="theme-name">Transparent</div>
+            <div class="theme-preview">01:23:45</div>
+            <div class="theme-desc">Almost invisible</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🌐 Tracking Mode</h2>
+        <div class="setting-row">
+          <div class="setting-label">
+            <h3>Track All Websites</h3>
+            <p>Show timer on every website you visit</p>
+          </div>
+          <div class="toggle-switch active" id="trackAllToggle"></div>
+        </div>
+
+        <div id="siteListSection" style="display: none">
+          <h3 style="font-size: 16px; margin: 24px 0 12px 0">
+            Specific Sites to Track
+          </h3>
+          <div class="site-input-row">
+            <input
+              type="text"
+              id="siteInput"
+              placeholder="e.g., twitter.com, facebook.com"
+            />
+            <button class="add-btn" id="addSiteBtn">Add Site</button>
+          </div>
+          <div class="tracked-sites" id="trackedSites"></div>
+        </div>
+
+        <div class="info-box">
+          <p>
+            💡 <strong>Tip:</strong> The widget shows just the timer by default.
+            Hover over it to see the site name, close button, and reset button.
+            When tracking all sites, you can still hide the widget on specific
+            pages by clicking the × button.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>
