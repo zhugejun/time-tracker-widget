@@ -178,3 +178,4 @@ Free to use and modify for personal use!
 **Made with ❤️ to help you be more mindful of your time online**
 
 Enjoy your new time awareness! 🎯
+# time-tracker-widget
