@@ -39,6 +39,19 @@ function setupEventListeners() {
         addSite();
       }
     });
+
+  // Reset today's data button
+  document
+    .getElementById('resetTodayBtn')
+    .addEventListener('click', function () {
+      if (
+        confirm(
+          "Reset all timers for today? This will clear all time tracking data for today and cannot be undone.\n\nNote: Timers automatically reset at midnight each day."
+        )
+      ) {
+        resetTodayData();
+      }
+    });
 }
 
 function loadSettings() {
@@ -156,4 +169,26 @@ function showSaveNotice() {
   setTimeout(() => {
     notice.classList.remove('show');
   }, 2000);
+}
+
+function resetTodayData() {
+  // Send message to background script to reset today's data
+  chrome.runtime.sendMessage({ action: 'resetTodayData' }, function (response) {
+    if (response && response.success) {
+      const notice = document.getElementById('saveNotice');
+      notice.textContent = `✓ Reset complete! Cleared ${response.count} timer(s) for today.`;
+      notice.style.background = '#fef3c7';
+      notice.style.color = '#92400e';
+      notice.classList.add('show');
+      setTimeout(() => {
+        notice.classList.remove('show');
+        // Reset notice back to default
+        setTimeout(() => {
+          notice.textContent = '✓ Settings saved automatically';
+          notice.style.background = '#d1fae5';
+          notice.style.color = '#10b981';
+        }, 300);
+      }, 3000);
+    }
+  });
 }
