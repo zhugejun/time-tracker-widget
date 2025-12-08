@@ -145,17 +145,20 @@ function renderTrackedSites() {
       (site) => `
     <div class="site-item">
       <span>${site}</span>
-      <button class="remove-btn" onclick="removeSiteFromList('${site}')">Remove</button>
+      <button class="remove-btn" data-site="${site}">Remove</button>
     </div>
   `
     )
     .join('');
-}
 
-// Make this available globally for onclick
-window.removeSiteFromList = function (site) {
-  removeSite(site);
-};
+  // Add event listeners to all remove buttons
+  container.querySelectorAll('.remove-btn').forEach((btn) => {
+    btn.addEventListener('click', function () {
+      const site = this.getAttribute('data-site');
+      removeSite(site);
+    });
+  });
+}
 
 function saveSettings(settings) {
   chrome.storage.local.set(settings, function () {
@@ -180,6 +183,10 @@ function resetTodayData() {
       notice.style.background = '#fef3c7';
       notice.style.color = '#92400e';
       notice.classList.add('show');
+      
+      // Set a flag to notify popup to refresh
+      chrome.storage.local.set({ lastResetTime: Date.now() });
+      
       setTimeout(() => {
         notice.classList.remove('show');
         // Reset notice back to default

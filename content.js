@@ -282,6 +282,12 @@
                 }
               });
             }
+          } else if (message.action === 'resetTimer') {
+            // Reset timer for this site
+            console.log('⏱️ Timer reset from options page');
+            elapsedSeconds = 0;
+            updateDisplay();
+            // Don't save - storage was already cleared by background script
           }
         });
       }

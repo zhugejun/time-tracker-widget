@@ -75,6 +75,21 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         console.log(
           `⏱️ Time Tracker: Manual reset complete. Removed ${removedCount} entries for today.`
         );
+        
+        // Broadcast reset message to all tabs
+        chrome.tabs.query({}, function (tabs) {
+          tabs.forEach((tab) => {
+            chrome.tabs.sendMessage(
+              tab.id,
+              { action: 'resetTimer' },
+              function () {
+                // Ignore errors for tabs that don't have content script
+                chrome.runtime.lastError;
+              }
+            );
+          });
+        });
+        
         sendResponse({ success: true, count: removedCount });
       });
     });

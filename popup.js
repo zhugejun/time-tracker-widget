@@ -67,6 +67,14 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
   });
+
+  // Listen for storage changes (e.g., when reset happens)
+  chrome.storage.onChanged.addListener(function (changes, namespace) {
+    // Refresh data when timeData changes or when reset happens
+    if (changes.timeData || changes.lastResetTime) {
+      loadData();
+    }
+  });
 });
 
 function loadData() {

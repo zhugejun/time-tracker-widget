@@ -360,6 +360,22 @@
           transform: translateY(0);
         }
       }
+
+      .reset-today-btn {
+        padding: 10px 20px;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+      }
+
+      .reset-today-btn:hover {
+        background: #dc2626;
+      }
     </style>
   </head>
   <body>
@@ -450,22 +466,7 @@
             <h3>Reset Today's Timers</h3>
             <p>Clear all time tracking data for today. This cannot be undone.</p>
           </div>
-          <button
-            id="resetTodayBtn"
-            style="
-              padding: 10px 20px;
-              background: #ef4444;
-              color: white;
-              border: none;
-              border-radius: 8px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s;
-              font-size: 14px;
-            "
-            onmouseover="this.style.background='#dc2626'"
-            onmouseout="this.style.background='#ef4444'"
-          >
+          <button id="resetTodayBtn" class="reset-today-btn">
             Reset Today
           </button>
         </div>
